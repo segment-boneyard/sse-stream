@@ -3,6 +3,8 @@
 
   A [Server-Sent Events](http://www.html5rocks.com/en/tutorials/eventsource/basics/) transform stream.
 
+  [![build status](https://secure.travis-ci.org/segmentio/sse-stream.png)](http://travis-ci.org/segmentio/sse-stream)
+
 ## Installation
 
 ```bash
