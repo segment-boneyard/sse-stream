@@ -4,12 +4,19 @@
  */
 
 var Transform = require('stream').Transform;
+var inherits = require('util').inherits;
 
 /**
- * Expose `sse`.
+ * Expose `SSE`.
  */
 
-module.exports = sse;
+module.exports = SSE;
+
+/**
+* Inherit prototype methods.
+*/
+
+inherits(SSE, Transform);
 
 /**
  * Create a Server-Sent Events transform stream.
@@ -18,25 +25,26 @@ module.exports = sse;
  * @api public
  */
 
-function sse(){
-  var stream = new Transform({ objectMode: true });
-  
-  stream._transform = function(chunk, _, done){
-    try {
-      chunk = stringify(chunk);
-    } catch(err) {
-      return done(err);
-    }
-   
-    var out = chunk.split('\n').map(function(line){
-      return 'data: ' + line + '\n';
-    }).join('') + '\n';
-    
-    done(null, out);
-  };
-  
-  return stream;
+function SSE(options){
+  if (!(this instanceof SSE)) return new SSE(options);
+  options = options || {};
+  Transform.call(this, options);
+  this._writableState.objectMode = true;
 }
+
+SSE.prototype._transform = function(chunk, _, done){
+  try {
+    chunk = stringify(chunk);
+  } catch(err) {
+    return done(err);
+  }
+
+  var out = chunk.split('\n').map(function(line){
+    return 'data: ' + line + '\n';
+  }).join('') + '\n';
+
+  done(null, out);
+};
 
 /**
  * Stringify `x`.
