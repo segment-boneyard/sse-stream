@@ -21,18 +21,26 @@ inherits(SSE, Transform);
 /**
  * Create a Server-Sent Events transform stream.
  *
+ * @param {Object} opts
  * @return {Stream}
  * @api public
  */
 
-function SSE(options){
-  if (!(this instanceof SSE)) return new SSE(options);
-  options = options || {};
-  Transform.call(this, options);
+function SSE(opts){
+  if (!(this instanceof SSE)) return new SSE(opts);
+  opts = opts || {};
+  Transform.call(this, opts);
   this._writableState.objectMode = true;
+  this.first = true;
+  this.retry = opts.retry;
 }
 
 SSE.prototype._transform = function(chunk, _, done){
+  if (this.first) {
+    if (this.retry) this.push('retry: ' + this.retry + '\n');
+    this.first = false;
+  }
+  
   try {
     chunk = stringify(chunk);
   } catch(err) {
@@ -43,7 +51,8 @@ SSE.prototype._transform = function(chunk, _, done){
     return 'data: ' + line + '\n';
   }).join('') + '\n';
 
-  done(null, out);
+  this.push(out);
+  done();
 };
 
 /**

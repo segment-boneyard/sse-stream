@@ -50,13 +50,13 @@ $
 
 ## API
 
-### sse()
+### sse(opts)
 
-  Create a new stream that transforms data into the server-sent events format.
+  Create a new stream that transforms data into the server-sent events format. It accepts (multiline) strings, numbers, buffers and objects as inputs. `error` events are emitted when functions or circular object structures are written to it.
 
-  Handles (multiline) strings, numbers, buffers and objects.
+  Options:
 
-  Emits `error` events when functions or circular object structures are written to it.
+  - `retry:number` How many milliseconds the browser should wait in between reconnects
 
 ## License
 

@@ -126,5 +126,26 @@ describe('sse', function(){
     read.pipe(sse()).pipe(write);
   });
   
-  
+  it('should send retry header', function(done){
+    var read = new Readable({ objectMode: true });
+    read._read = function(){
+      this.push('foo\nbar');
+      this.push(null);
+    };
+    
+    var write = new Writable({ objectMode: true });
+    var first = true;
+    write._write = function(chunk, _, cb){
+      if (first) {
+        assert.equal(chunk, 'retry: 5000\n');
+        first = false;
+      } else {
+        assert.equal(chunk, 'data: foo\ndata: bar\n\n');
+        done();
+      }
+      cb();
+    };
+    
+    read.pipe(sse({ retry: 5000 })).pipe(write);
+  });
 });
